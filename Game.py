@@ -10,7 +10,9 @@ enemy = {"room1": [],"room2": [], "room3": [],"room4": []}
 point = {"room1": [],"room2": [], "room3": [],"room4": []}
 weapon = {"room1": [],"room2": [], "room3": [],"room4": []}
 money = {"room1": [],"room2": [], "room3": [],"room4": []}
-others = {"room1": [],"room2": [], "room3": [],"room4": []}
+others = {"room1": {},"room2": {}, "room3": {},"room4": {}}
+shop_items = {"weapon": {}, "key" : {}, "healing pad": [], "armour": {}}
+inventory = {"weapon": {}, "key": {}, "armour": {}}
 
 # Functions
 def extract_data(room_num):
@@ -23,6 +25,14 @@ def extract_data(room_num):
                 point[room_num] = temp.split(',')
             if "Weapon" in line:
                 weapon[room_num] = temp.split(',')
+            if "Money" in line:
+                money[room_num] = temp
+            if "Treasure" in line:
+                others[room_num]["treasure"] = temp.split(',')
+            if "HealingPad" in line:
+                others[room_num]["healing pad"] = temp
+            if "Key" in line:
+                others[room_num]["key"] = temp.split(',')
 
 def show_data(room_num):
     print("\n" + room[room_num][0] + room[room_num][1])
@@ -48,6 +58,24 @@ with open("Adventure_Game/Room4.txt", "r") as r4File:
     room["room4"] = r4File.readlines()
     extract_data("room4")
 
+with open("Adventure_Game/Shop.txt", "r") as my_shop:
+    shop_wholetext = my_shop.readlines()
+    for index, line in enumerate(shop_wholetext):
+        temp = shop_wholetext[index].strip()
+        if "weapon" in shop_wholetext[index]:
+            temp = temp.split(':')
+            shop_items["weapon"][temp[0]] = (temp[1]).split(',')
+        if "key" in shop_wholetext[index]:
+            temp = temp.split(':')
+            shop_items["key"][temp[0]] = (temp[1]).split(',')
+        if "HealingPad" in line:
+            heal = line.split(" ")
+            shop_items["healing pad"].append(heal[-1].strip())
+            shop_items["healing pad"].append(shop_wholetext[index+1].strip())
+        if "armour" in shop_wholetext[index]:
+            temp = temp.split(':')
+            shop_items["armour"][temp[0]] = (temp[1]).split(',')
+
 # Functions for displaying
 def r1_show():
     show_data("room1")
@@ -60,6 +88,23 @@ def r3_show():
 
 def r4_show():
     show_data("room4")
+
+def shop_show(balance):
+    print("\nWelcome to the shop!", name)
+    print("What do you want to buy? \n1. Weapons\n2. Key\n3.Healing Pad\n4. Armour")
+    ans = input("Your answer (1,2,3,4): ")
+    if ans =="1":
+        print("Here are the weapons", name, "{Weapon description: [name, damage, price]}")
+        print(shop_items["weapon"])
+        weapon_num = input("Which weapon do you want to buy? Your answer (1/2/3/...): ")
+        inventory["weapon"] = shop_items["weapon"]["weapon"+weapon_num]
+        balance-=int(shop_items["weapon"]["weapon"+weapon_num][-1])
+        playerBalance.configure(text= "string: "+ str(balance))
+        
+def inventory_show():
+    print("\nHere is your inventory list! Visit the shop to buy more!")
+    print(inventory)
+
 
 # Asking the player's name and setting the default values
 name = input("Enter your name: ")
@@ -107,9 +152,9 @@ room4.grid(row = 0, column = 3, padx= 10)
 
 frame2 = tkinter.Frame(window)
 frame2.pack(anchor = "n", padx = 10, pady =15)
-shop = tkinter.Button(frame2, text= "Shop", fg= "black", bg= "yellow",font= ('Calibri, 12'))
+shop = tkinter.Button(frame2, text= "Shop", command =lambda:shop_show(balance), fg= "black", bg= "yellow",font= ('Calibri, 12'))
 shop.grid(row = 0, column = 0, padx= 10)
-myInventory = tkinter.Button(frame2, text= "My Inventory", fg= "black", bg= "yellow",font= ('Calibri, 12'))
+myInventory = tkinter.Button(frame2, text= "My Inventory", command=inventory_show, fg= "black", bg= "yellow",font= ('Calibri, 12'))
 myInventory.grid(row = 0, column = 1, padx= 10)
 
 window.mainloop()
