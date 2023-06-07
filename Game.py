@@ -12,7 +12,7 @@ weapon = {"room1": [],"room2": [], "room3": [],"room4": []}
 money = {"room1": [],"room2": [], "room3": [],"room4": []}
 others = {"room1": {},"room2": {}, "room3": {},"room4": {}}
 shop_items = {"weapon": {}, "key" : {}, "healing pad": [], "armour": {}}
-inventory = {"weapon": {}, "key": {}, "armour": {}}
+inventory = {"weapon": {}, "key": {}, "healing pad": 0, "armour": {}}
 
 # Functions
 
@@ -52,8 +52,8 @@ def read_shop():
                 shop_items["key"][temp[0]] = (temp[1]).split(',')
             if "HealingPad" in line:
                 heal = line.split(" ")
-                shop_items["healing pad"].append(heal[-1].strip())
                 shop_items["healing pad"].append(shop_wholetext[index+1].strip())
+                shop_items["healing pad"].append(heal[-1].strip())
             if "armour" in shop_wholetext[index]:
                 temp = temp.split(':')
                 shop_items["armour"][temp[0]] = (temp[1]).split(',')
@@ -71,7 +71,7 @@ def room_show(room_num):
 def shop_show():
     read_shop()
     window = tkinter.Tk() #A new window
-    window.geometry("1200x400") #Setting the width and height
+    window.geometry("1500x700") #Setting the width and height
     window.title("Shop") #Title
     greeting = tkinter.Label(window, text = 'Welcome to the shop!', font = ('Calibri, 14'))
     greeting.pack(pady = 5)
@@ -89,13 +89,6 @@ def shop_show():
     healingPad.grid(row = 0, column = 2, padx= 10)
     armour = tkinter.Button(frame, text= "Armours", command=lambda: item_list(shop_items, "armour", frame), fg= "black", bg= "pink", font = ('Calibri, 12'))
     armour.grid(row = 0, column = 3, padx= 10)
-    
-    #     print("Here are the weapons", name, "{Weapon description: [name, damage, price]}")
-    #     print(shop_items["weapon"])
-    #     weapon_num = input("Which weapon do you want to buy? Your answer (1/2/3/...): ")
-    #     inventory["weapon"] = shop_items["weapon"]["weapon"+weapon_num]
-    #     balance-=int(shop_items["weapon"]["weapon"+weapon_num][-1])
-    #     playerBalance.configure(text= "string: "+ str(balance))
 
 # Show item list in the shop
 def item_list(shop_items, item, frame):
@@ -105,19 +98,58 @@ def item_list(shop_items, item, frame):
             weapon_details = tkinter.Label(frame, text= "Weapon "+ str(i) + ": Name: " + shop_items["weapon"][weapon][0] + ": Damage: " + shop_items["weapon"][weapon][1]+ ": Price: " + shop_items["weapon"][weapon][2], font = ('Calibri, 12'))
             weapon_details.grid(row=i, column=0,padx=10, pady=10)
             i+=1
+        ask_num(shop_items, frame, "Type a weapon number to buy.\nEg: weapon1/weapon2/weapon3/...", 0, i)
+
     if item == "key":
         for key in shop_items["key"]:
             key_details = tkinter.Label(frame, text= "Key "+ str(i) + ": Price: " + shop_items["key"][key][1] , font = ('Calibri, 12'))
             key_details.grid(row=i, column=1, padx=10, pady=10)
             i+=1
+        ask_num(shop_items, frame, "Do you want to buy a key? If yes, type 'key'. ", 1, i)
+
     if item == "heal":
         heal_details = tkinter.Label(frame, text= "Price: " + shop_items["healing pad"][0] + "    Left: " + shop_items["healing pad"][1] , font = ('Calibri, 12'))
         heal_details.grid(row=i, column=2, padx=10, pady=10)
+        ask_num(shop_items, frame, "Do you want to buy healing pad? If yes, type 'heal'.", 2, 1)
+
     if item == "armour":
         for armour in shop_items["armour"]:
             armour_details = tkinter.Label(frame, text= "Armour "+ str(i)+ ": Durability: " + shop_items["armour"][armour][0] + ": Price: " + shop_items["armour"][armour][1] , font = ('Calibri, 12'))
             armour_details.grid(row=i, column=3, padx=10, pady=10)
             i+=1
+        ask_num(shop_items, frame, "Type a armour number to buy\nEg: armour1/armour2/...", 3, i)
+    
+# Asking the items to buy and buying process
+def ask_num(shop_items, frame, text, column, i):
+    buy_ques = tkinter.Label(frame, text= text , font = ('Calibri, 12'))
+    buy_ques.grid(row=i+1, column=column, padx=10, pady=10)
+    buy_ans = tkinter.Entry(frame)
+    buy_ans.grid(row=i+2, column=column, padx=10, pady=5)
+    send = tkinter.Button(frame, text = "Buy", command=lambda: buy(shop_items, buy_ans.get(), message, balance, playerBalance), fg = "white", bg= "green")
+    send.grid(row =i+3, column= column)
+    message = tkinter.Label(frame, text = "", font = ('Calibri, 12'))
+    message.grid(row =i+4, column= column)
+
+def buy(shop_items, ans, message, balance, playerBalance):
+    if "weapon" in ans or ans == 'key' or ans == 'heal' or "armour" in ans:
+        if 'weapon' in ans:
+            item = shop_items["weapon"][ans]
+            inventory["weapon"][ans] = item
+        if ans == 'key':
+            item = shop_items["key"]["key"]
+            inventory["key"][ans] = item
+        if ans == 'heal':
+            item = shop_items["key"]["healing pad"]
+            inventory["healing pad"] += 1
+        if 'armour' in ans:
+            item = shop_items["armour"][ans]
+            inventory["armour"][ans] = item
+        balance -= int(item[-1])
+        playerBalance.config(text= 'Balance: ' + str(balance))
+        message.config(text="Successfully Bought! Check your inventory!!")
+    else:
+        message.config(text="Buy Failed! Type again correctly.")
+    
 
 # Displaying the player's inventory
 def inventory_show():
