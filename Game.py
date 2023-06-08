@@ -30,7 +30,6 @@ playerBalance = tkinter.Label(window, text = 'Balance: ' + str(balance), font = 
 playerHealth = tkinter.Label(window, text = 'Health: ' + str(health), font = ('Calibri, 12') )
 playerPoints = tkinter.Label(window, text = 'Points: ' + str(points), font = ('Calibri, 12') )
 
-
 # Functions
 # Reading Files and Extracting the Data
 def read_files(room_num):
@@ -86,14 +85,14 @@ def room_show(room_num):
 # Displaying the data of the shop
 def shop_show():
     read_shop()
-    window = tkinter.Tk() #A new window
-    window.geometry("1500x700") #Setting the width and height
-    window.title("Shop") #Title
-    greeting = tkinter.Label(window, text = 'Welcome to the shop!', font = ('Calibri, 14'))
+    shop_window = tkinter.Tk() #A new shop_window
+    shop_window.geometry("1500x700") #Setting the width and height
+    shop_window.title("Shop") #Title
+    greeting = tkinter.Label(shop_window, text = 'Welcome to the shop!', font = ('Calibri, 14'))
     greeting.pack(pady = 5)
-    question = tkinter.Label(window, text ="What do you want to buy?", font = ('Calibri, 14'))
+    question = tkinter.Label(shop_window, text ="What do you want to buy?", font = ('Calibri, 14'))
     question.pack(pady= 5)
-    frame = tkinter.Frame(window)
+    frame = tkinter.Frame(shop_window)
     frame.pack(anchor = "n", padx = 10, pady =5)
     weapon = tkinter.Button(frame, text= "Weapons", command=lambda: item_list(shop_items, "weapon", frame), fg= "white", bg= "blue", font = ('Calibri, 12'))
     weapon.grid(row = 0, column = 0, padx= 10)
@@ -164,6 +163,8 @@ def buy_heal(message, balance):
         balance = balance - int(item[-1])
         playerBalance.config(text= 'Balance: ' + str(balance))
         message.config(text="Successfully Purchased! Check your inventory!!")
+        shop_items["healing pad"][0] = int(shop_items["healing pad"][0])-1
+        healing_details.configure(text= "Price: " + shop_items["healing pad"][1] + "    Left: " + str(shop_items["healing pad"][0]))
     else:
         message.config(text="Purchase Failed! Not enough money")
 
@@ -207,7 +208,7 @@ healing_details = tkinter.Label(inventory_frame, text= "", font = ('Calibri, 12'
 armour_details = tkinter.Label(inventory_frame, text= "", font = ('Calibri, 12'))
 
 def start_game(name_entry):
-    playerName.pack(pady = 5)   
+    playerName.pack(pady = 5)
     playerBalance.pack(pady = 5)
     playerHealth.pack(pady = 5)
     playerPoints.pack(pady = 5)
@@ -238,13 +239,13 @@ def start_game(name_entry):
 def inventory_show():
     intro = tkinter.Label(inventory_frame, text="Here is your inventory list! Visit the shop to buy more!", font = ('Calibri, 12'))
     intro.grid(row=0, column=0, pady = 5)
-    weapons_details.configure(text= inventory["weapon"], font = ('Calibri, 12'))
+    weapons_details.configure(text= "Weapons - " + str(inventory["weapon"]), font = ('Calibri, 12'))
     weapons_details.grid(row=1, column=0,padx=10, pady=5)
-    key_details.configure(text=  inventory["key"], font = ('Calibri, 12'))
+    key_details.configure(text="Keys - " +   str(inventory["key"]), font = ('Calibri, 12'))
     key_details.grid(row=2, column=0,padx=10, pady=5)
-    healing_details.configure(text=  inventory["healing pad"], font = ('Calibri, 12'))
-    healing_details.grid(row=3, column=0,padx=10, pady=5)
-    armour_details.configure(text=  inventory["armour"], font = ('Calibri, 12'))
+    healing_details.configure(text= "No: of healing pads - " +  str(inventory["healing pad"]), font = ('Calibri, 12'))
+    healing_details.grid(row=3, column=0 ,padx=10, pady=5)
+    armour_details.configure(text="Armours - " + str(inventory["armour"]), font = ('Calibri, 12'))
     armour_details.grid(row=4, column=0,padx=10, pady=5)
 
 window.mainloop()
