@@ -121,7 +121,7 @@ def item_list(shop_items, item, frame):
         ask_num(frame, "Do you want to buy a key? If yes, type 'key'. ", 1, i)
 
     if item == "heal":
-        heal_details = tkinter.Label(frame, text= "Price: " + shop_items["healing pad"][1] + "    Left: " + shop_items["healing pad"][0] , font = ('Calibri, 12'))
+        heal_details = tkinter.Label(frame, text= "Price: " + shop_items["healing pad"][1] + "    Left: " + str(shop_items["healing pad"][0]) , font = ('Calibri, 12'))
         heal_details.grid(row=i, column=2, padx=10, pady=10)
         ask_num(frame, "Do you want to buy healing pad? If yes, type 'heal'.", 2, 1)
 
@@ -138,12 +138,13 @@ def ask_num(frame, text, column, i):
     buy_ques.grid(row=i+1, column=column, padx=10, pady=10)
     buy_ans = tkinter.Entry(frame)
     buy_ans.grid(row=i+2, column=column, padx=10, pady=5)
-    send = tkinter.Button(frame, text = "Buy", command=lambda: buy(buy_ans, message, balance), fg = "white", bg= "green")
+    send = tkinter.Button(frame, text = "Buy", command=lambda: buy(buy_ans, message), fg = "white", bg= "green")
     send.grid(row =i+3, column= column)
     message = tkinter.Label(frame, text = "", font = ('Calibri, 12'))
     message.grid(row =i+4, column= column)
 
-def buy_items(item_type, ans, message, balance):
+def buy_items(item_type, ans, message):
+    global balance
     try:
         item = shop_items[item_type][ans]
         if balance - int(item[-1])>=0:
@@ -156,7 +157,9 @@ def buy_items(item_type, ans, message, balance):
     except:
         message.config(text="Purchase Failed! Type again correctly.")
 
-def buy_heal(message, balance):
+def buy_heal(message):
+    global balance
+    global shop_items
     item = shop_items["healing pad"]
     if balance-int(item[-1])>=0:
         inventory["healing pad"] += 1
@@ -164,22 +167,23 @@ def buy_heal(message, balance):
         playerBalance.config(text= 'Balance: ' + str(balance))
         message.config(text="Successfully Purchased! Check your inventory!!")
         shop_items["healing pad"][0] = int(shop_items["healing pad"][0])-1
-        healing_details.configure(text= "Price: " + shop_items["healing pad"][1] + "    Left: " + str(shop_items["healing pad"][0]))
+        healing_details.config(text= "Price: " + shop_items["healing pad"][1] + "  Left: " + str(shop_items["healing pad"][0]))
     else:
         message.config(text="Purchase Failed! Not enough money")
 
-def buy(buy_ans, message, balance):
+def buy(buy_ans, message):
+    global balance
     ans = buy_ans.get().lower()
     buy_ans.delete(0, tkinter.END)
     if "weapon" in ans or ans == 'key' or ans == 'heal' or "armour" in ans:
         if 'weapon' in ans:
-            buy_items("weapon", ans, message, balance)
+            buy_items("weapon", ans, message)
         if ans == 'key':
-            buy_items("key", ans, message, balance)
+            buy_items("key", ans, message)
         if ans == 'heal':
-            buy_heal(message, balance)
+            buy_heal(message)
         if 'armour' in ans:
-            buy_items("armour", ans, message, balance)
+            buy_items("armour", ans, message)
     else:
         message.config(text="Purchase Failed! Type again correctly.")
 
