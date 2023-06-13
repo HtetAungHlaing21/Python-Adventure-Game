@@ -36,6 +36,7 @@ weapons_details = tkinter.Label(window, text= "", font = ('Calibri, 12'))
 key_details = tkinter.Label(window, text= "", font = ('Calibri, 12'))
 healing_details = tkinter.Label(window, text= "", font = ('Calibri, 12'))
 armour_details = tkinter.Label(window, text= "", font = ('Calibri, 12'))
+messagebox = tkinter.Label(window, text= "", fg="red", font = ('Calibri, 12'))
 
 # Functions
 # Reading Files and Extracting the Data
@@ -249,6 +250,20 @@ def buy(buy_ans, message):
     else:
         message.config(text="Purchase Failed! Type again correctly.")
 
+def use_heal():
+    global health
+    if inventory["healing pad"]>0:
+        if health <= 50:
+            health +=50
+        else:
+            health = 100
+        inventory["healing pad"] -=1
+        healing_details.configure(text= "No: of healing pads - " +  str(inventory["healing pad"]), font = ('Calibri, 12'))
+        playerHealth.configure(text = 'Health: ' + str(health), font = ('Calibri, 12'))
+        messagebox.configure(text= "Successfully Healed!", font = ('Calibri, 12'))
+    else:
+        messagebox.configure(text="You have no healing pads.", font = ('Calibri, 12'))
+
 # GUI
 # Welcome message & Initial Data
 greeting = tkinter.Label(window, text = 'Welcome to Adventure World!', font = ('Calibri, 14'))
@@ -295,6 +310,10 @@ def start_game(name_entry):
     shop = tkinter.Button(frame2, text= "Shop", command = lambda:shop_show(), fg= "black", bg= "yellow",font= ('Calibri, 12'))
     shop.grid(row = 0, column = 0, padx= 10)
 
+    # Use the healing pad
+    use_heal_btn = tkinter.Button(frame2, text="Use Healing Pad", command=use_heal, fg="white", bg="green" ,font = ('Calibri, 12'))
+    use_heal_btn.grid(row=0, column=1, pady= 5)
+
     # My Inventory
     intro.pack(pady = 10)
     weapons_details.configure(text= "Weapons - " + str(inventory["weapon"]), font = ('Calibri, 12'))
@@ -305,5 +324,6 @@ def start_game(name_entry):
     healing_details.pack(pady = 5)
     armour_details.configure(text="Armours - " + str(inventory["armour"]), font = ('Calibri, 12'))
     armour_details.pack(pady = 5)
+    messagebox.pack(pady=5)
 
 window.mainloop()
