@@ -11,6 +11,7 @@ window.title("Adventure Game") #Title
 
 # Asking the player's name and setting the default values
 balance = random.randint(50, 310)
+# balance = 300
 health = 100
 points = 0
 
@@ -23,6 +24,7 @@ money = {"room1": [],"room2": [], "room3": [],"room4": []}
 others = {"room1": {},"room2": {}, "room3": {},"room4": {}}
 shop_items = {"weapon": {}, "key" : {}, "healing pad": [], "armour": {}}
 inventory = {"weapon": {}, "key": {}, "healing pad": 0, "armour": {}}
+battle_items = {"weapon" : [], "armour": []}
 
 # Datas on GUI
 playerName = tkinter.Label(window, font = ('Calibri, 12') )
@@ -84,11 +86,87 @@ def read_shop():
 # Displaying the data of the room
 def room_show(room_num):
     read_files(room_num)
-    print("\n" + room[room_num][0] + room[room_num][1])
-    print("Enemy Details")
-    print("Name:", enemy[room_num][0])
-    print("Damage:", enemy[room_num][1])
-    print("Health:", enemy[room_num][2])
+    room_GUI = tkinter.Tk() #A new room_GUI
+    room_GUI.geometry("700x700") #Setting the width and height
+    room_GUI.title(room_num.capitalize()) #Title
+    greeting = tkinter.Label(room_GUI, text = room[room_num][0] + room[room_num][1], font = ('Calibri, 14'))
+    greeting.pack(pady = 5)
+    enemy_title = tkinter.Label(room_GUI, text = "Enemy Details", font = ('Calibri, 14'))
+    enemy_title.pack(pady = 5)
+    enemy_name = tkinter.Label(room_GUI, text = "Name:" + enemy[room_num][0], font = ('Calibri, 12'))
+    enemy_name.pack(pady = 5)
+    enemy_damage = tkinter.Label(room_GUI, text = "Damage:"+ enemy[room_num][1], font = ('Calibri, 12'))
+    enemy_damage.pack(pady = 5)
+    enemy_health = tkinter.Label(room_GUI, text = "Health:"+ enemy[room_num][2], font = ('Calibri, 12'))
+    enemy_health.pack(pady = 5)
+    options = tkinter.Frame(room_GUI)
+    options.pack(pady= 10)
+    fight = tkinter.Button(options, text="Fight!", command=lambda:fight_function(options,message), bg= "red", fg= "white", font = ('Calibri, 12') )
+    fight.grid(row=0, column=0, padx= 10)
+    run = tkinter.Button(options, text="Run Away!",command=lambda:runAway_function(room_GUI), bg= "green", fg= "white", font = ('Calibri, 12') )
+    run.grid(row=0, column=1, padx= 10)
+    message = tkinter.Label(room_GUI, text = "", font = ('Calibri, 12'), fg="red")
+    message.pack(pady = 5)
+
+def fight_function(options,message):
+    weapon_choose = tkinter.Button(options, text="Choose Weapons",command=lambda:weapon_choose_function(options,message), bg= "white", fg= "red", font = ('Calibri, 12') )
+    weapon_choose.grid(row=1, column=0, padx= 10, pady= 30)
+    armour_choose = tkinter.Button(options, text="Choose Armours",command=lambda:armour_choose_function(options,message), bg= "white", fg= "red", font = ('Calibri, 12') )
+    armour_choose.grid(row=1, column=1, padx= 10, pady= 30)
+
+def weapon_choose_function(options, message):
+    weapons = tkinter.Label(options, text= "Weapons - " + str(inventory["weapon"]), font = ('Calibri, 12') )
+    weapons.grid(row=2, column=0, padx= 10)
+    if len(inventory["weapon"]) >0:
+        weapon_ques = tkinter.Label(options, text="Choose your weapon! Write weapon1/weapon2 ...", font = ('Calibri, 11'))
+        weapon_ques.grid(row=3, column=0, pady=5)
+        weapon_ans = tkinter.Entry(options)
+        weapon_ans.grid(row=4, column=0, pady=5)
+        answer = tkinter.Button(options, text="Select", fg="red", bg="white", command=lambda:select_items("weapon", weapon_ans, message, options), font= ('Calibri, 12'))
+        answer.grid(row=5, column=0, pady=5)
+    else:
+        message.config(text="You have no weapons. Buy more in the shop!")
+
+def armour_choose_function(options,message):
+    armours = tkinter.Label(options, text= "Armours - " + str(inventory["armour"]), font = ('Calibri, 12'))
+    armours.grid(row=2, column=1, padx=10)
+    if len(inventory["armour"])>0:
+        armour_ques = tkinter.Label(options, text="Choose your armour! Write armour1/armour2 ...", font = ('Calibri, 11'))
+        armour_ques.grid(row=3, column=1, pady=5)
+        armour_ans = tkinter.Entry(options)
+        armour_ans.grid(row=4, column=1, pady=5)
+        answer = tkinter.Button(options, text="Select", fg="red", bg="white", command=lambda:select_items("armour", armour_ans, message, options) , font= ('Calibri, 12'))
+        answer.grid(row=5, column=1, pady=5)
+    else:
+        message.config(text="You have no armours. Buy more in the shop!")
+
+def select_items(item_name, item, message, options):
+    global battle_items
+    name = item.get()
+    item.delete(0, tkinter.END)
+    if item_name == "weapon":
+        try:
+            battle_items["weapon"].append(inventory["weapon"][name])
+            start = tkinter.Button(options, text="Start the FIGHT!", command=start_fight, bg="red", fg="white", font = ('Calibri, 11'))
+            start.grid(row=6, column=0, pady=10)
+            message.config(text="Selected! Start the fight now!")
+        except:
+            message.config(text="No valid weapon! Type again correctly.")
+    elif item_name == "armour":
+        try:
+            battle_items["armour"].append(inventory["armour"][name])
+            message.config(text="Selected!")
+        except:
+            message.config(text="No valid armour! Type again correctly.")
+
+def start_fight():
+    global battle_items
+    print(battle_items)
+
+def runAway_function(room_GUI):
+    global battle_items
+    room_GUI.destroy()
+    battle_items = {"weapon" : [], "armour": []}
 
 # Displaying the data of the shop
 def shop_show():
