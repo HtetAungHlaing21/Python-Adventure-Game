@@ -10,8 +10,8 @@ window.geometry("700x700") #Setting the width and height
 window.title("Adventure Game") #Title
 
 # Asking the player's name and setting the default values
-balance = random.randint(50, 310)
-# balance = 300
+# balance = random.randint(50, 310)
+balance = 300
 health = 100
 points = 0
 
@@ -24,7 +24,7 @@ money = {"room1": [],"room2": [], "room3": [],"room4": []}
 others = {"room1": {},"room2": {}, "room3": {},"room4": {}}
 shop_items = {"weapon": {}, "key" : {}, "healing pad": [], "armour": {}}
 inventory = {"weapon": {}, "key": {}, "healing pad": 0, "armour": {}}
-battle_items = {"weapon" : [], "armour": []}
+battle_items = {}
 
 # Datas on GUI
 playerName = tkinter.Label(window, font = ('Calibri, 12') )
@@ -146,7 +146,7 @@ def select_items(item_name, item, message, options):
     item.delete(0, tkinter.END)
     if item_name == "weapon":
         try:
-            battle_items["weapon"].append(inventory["weapon"][name])
+            battle_items[name] = inventory["weapon"][name]
             start = tkinter.Button(options, text="Start the FIGHT!", command=start_fight, bg="red", fg="white", font = ('Calibri, 11'))
             start.grid(row=6, column=0, pady=10)
             message.config(text="Selected! Start the fight now!")
@@ -154,7 +154,7 @@ def select_items(item_name, item, message, options):
             message.config(text="No valid weapon! Type again correctly.")
     elif item_name == "armour":
         try:
-            battle_items["armour"].append(inventory["armour"][name])
+            battle_items[name] = inventory["armour"][name]
             message.config(text="Selected!")
         except:
             message.config(text="No valid armour! Type again correctly.")
@@ -166,7 +166,7 @@ def start_fight():
 def runAway_function(room_GUI):
     global battle_items
     room_GUI.destroy()
-    battle_items = {"weapon" : [], "armour": []}
+    battle_items = {}
 
 # Displaying the data of the shop
 def shop_show():
