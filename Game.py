@@ -10,8 +10,8 @@ window.geometry("1000x700") #Setting the width and height
 window.title("Adventure Game") #Title
 
 # Asking the player's name and setting the default values
-# balance = random.randint(50, 310)
-balance = 1500
+balance = random.randint(50, 310)
+# balance = 1500
 health = 100
 points = 0
 
@@ -26,24 +26,34 @@ shop_items = {"weapon": {}, "key" : {}, "healing pad": [], "armour": {}}
 inventory = {"weapon": {}, "key": {}, "healing pad": 0, "armour": {}, "treasure" : {}}
 battle_items = {"weapon" : {}, "armour" : {}}
 battle_items_name =[]
+key_num = 1;
+weapon_num = 6;
+treasure_num = 1
 
 # Datas on GUI
 playerName = tkinter.Label(window, font = ('Calibri, 12') )
 playerBalance = tkinter.Label(window, text = 'Balance: ' + str(balance), font =  ('Calibri, 12'))
-playerHealth = tkinter.Label(window, text = 'Health: ' + str(health), font = ('Calibri, 12') )
+playerHealth = tkinter.Label(window, text = 'Health: ' + str(round(health,2)), font = ('Calibri, 12') )
 playerPoints = tkinter.Label(window, text = 'Points: ' + str(points), font = ('Calibri, 12') )
 
 # Open treasure box function
 def open_treasure_box():
     global inventory, points
     for item in inventory["treasure"]:
-        if inventory["treasure"][item][0] == inventory["key"]["key"][0]:
-            points += int(inventory["treasure"][item][1])
-            inventory["treasure"].pop(item)
+        try:
+            for key in inventory["key"]:
+                if inventory["treasure"][item][0] == inventory["key"][key][0]:
+                    points += int(inventory["treasure"][item][1])
+                    inventory["treasure"].pop(item)
+                    inventory["key"].pop(key)
+                    messagebox.config(text="Points collected! Click again if you have more treasure boxes.")
+                    break                
             break
+        except:
+            messagebox.config(text="No valid treasure box to collect!")
     playerPoints.config(text="Points: " + str(points), font = ('Calibri, 12'))
-    messagebox.config(text="Points collected! Click again if you have more treasure!")
     treasure_details.configure(text="Treasure - " + str(inventory["treasure"]), font = ('Calibri, 12'))
+    key_details.configure(text="Keys - " + str(inventory["key"]), font = ('Calibri, 12'))
 
 # Inventory Data on GUI
 intro = tkinter.Label(window, text= "Here is your inventory list! Visit the shop to buy more!", font = ('Calibri, 14'))
@@ -186,8 +196,7 @@ def select_armour(item, message):
         message.config(text="No valid armour! Type again correctly.")
 
 def start_fight(room, message, room_GUI):
-    global battle_items, health, enemy, points, money, point, balance, battle_items_name
-    i=6
+    global battle_items, health, enemy, points, money, point, balance, battle_items_name, key_num, weapon_num, treasure_num
     enemy_health_recovery = enemy[room][2]
     enemy_health = int(enemy[room][2])
     enemy_damage = int(enemy[room][1])
@@ -199,10 +208,12 @@ def start_fight(room, message, room_GUI):
         enemy_health -= int(battle_items["weapon"][1])
         if enemy_health<=0:
             points+=int(point[room])
-            inventory["weapon"]["weapon" + str(i)] = weapon[room]
+            inventory["weapon"]["weapon" + str(weapon_num)] = weapon[room]
+            weapon_num +=1
             balance += int(money[room])
             try:
-                inventory["treasure"]["treasure 1"] = others[room]["treasure"]
+                inventory["treasure"]["treasure"+str(treasure_num)] = others[room]["treasure"]
+                treasure_num+=1
                 open_treasure.pack(pady= 5)
             except:
                 pass
@@ -211,11 +222,11 @@ def start_fight(room, message, room_GUI):
             except:
                 pass
             try:
-                inventory["key"]["key"] = others[room]["key"]
+                inventory["key"]["key"+str(key_num)] = others[room]["key"]
+                key_num +=1
             except:
                 pass
             message.config(text="Congratulations! You Won the Battle!")
-            i+=1
             enemy[room][2] = str(enemy_health)
             break
         health -= enemy_damage
@@ -230,7 +241,7 @@ def start_fight(room, message, room_GUI):
         inventory["armour"].pop(battle_items_name[1])
     except:
         pass
-    playerHealth.configure(text = 'Health: ' + str(health), font = ('Calibri, 12'))
+    playerHealth.configure(text = 'Health: ' + str(round(health,2)), font = ('Calibri, 12'))
     playerBalance.configure(text = 'Balance: ' + str(balance), font = ('Calibri, 12'))
     playerPoints.configure(text = 'Points: ' + str(points), font = ('Calibri, 12'))
     weapons_details.configure(text= "Weapons - " + str(inventory["weapon"]), font = ('Calibri, 12'))
@@ -415,7 +426,7 @@ def use_heal():
             health = 100
         inventory["healing pad"] -=1
         healing_details.configure(text= "No: of healing pads - " +  str(inventory["healing pad"]), font = ('Calibri, 12'))
-        playerHealth.configure(text = 'Health: ' + str(health), font = ('Calibri, 12'))
+        playerHealth.configure(text = 'Health: ' + str(round(health,2)), font = ('Calibri, 12'))
         messagebox.configure(text= "Successfully Healed!", font = ('Calibri, 12'))
     else:
         messagebox.configure(text="You have no healing pads.", font = ('Calibri, 12'))
