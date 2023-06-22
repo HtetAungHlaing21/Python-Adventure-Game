@@ -8,6 +8,7 @@ import random #For random money
 
 # Balance, health and points of the player
 balance = random.randint(200, 500)
+# balance = 5000
 health = 100
 points = 0
 
@@ -81,8 +82,8 @@ def room_show(room_num):
         enemy_title.pack(pady = 5)
         enemy_name = tkinter.Label(room_GUI, text = "Name:" + enemy[room_num][0], font = ('Calibri, 12'))
         enemy_name.pack(pady = 5)
-        enemy_damage = tkinter.Label(room_GUI, text = "Damage:"+ enemy[room_num][1], font = ('Calibri, 12'))
-        enemy_damage.pack(pady = 5)
+        enemy_damage_GUI = tkinter.Label(room_GUI, text = "Damage:"+ enemy[room_num][1], font = ('Calibri, 12'))
+        enemy_damage_GUI.pack(pady = 5)
         enemy_health = tkinter.Label(room_GUI, text = "Health:"+ enemy[room_num][2], font = ('Calibri, 12'))
         enemy_health.pack(pady = 5)
         options = tkinter.Frame(room_GUI)
@@ -210,6 +211,7 @@ def start_fight(room, message, room_GUI):
         inventory["armour"].pop(battle_items_name[1])
     except:
         pass
+    enemy[room][2] = str(enemy_health)
     playerHealth.configure(text = 'Health: ' + str(round(health,2)), font = ('Calibri, 12'))
     playerBalance.configure(text = 'Balance: ' + str(balance), font = ('Calibri, 12'))
     playerPoints.configure(text = 'Points: ' + str(points), font = ('Calibri, 12'))
@@ -487,6 +489,7 @@ def quit_game():
 def reset_game():
     global balance, health, points, inventory, key_num, weapon_num, treasure_num
     balance = random.randint(200, 500)
+    # balance = 5000
     health = 100
     points = 0
     inventory = {"weapon": {}, "key": {}, "healing pad": 0, "armour": {}, "treasure" : {}}
