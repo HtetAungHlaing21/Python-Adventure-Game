@@ -487,6 +487,7 @@ def quit_game():
 
 # Resetting the game
 def reset_game():
+    global balance, health, points, inventory
     balance = random.randint(50, 310)
     health = 100
     points = 0
