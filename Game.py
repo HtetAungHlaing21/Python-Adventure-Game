@@ -7,7 +7,7 @@ import random #For random money
 # Variable Section Starts
 
 # Balance, health and points of the player
-balance = random.randint(50, 310)
+balance = random.randint(200, 500)
 health = 100
 points = 0
 
@@ -22,12 +22,6 @@ shop_items = {"weapon": {}, "key" : {}, "healing pad": [0, 0], "armour": {}}
 inventory = {"weapon": {}, "key": {}, "healing pad": 0, "armour": {}, "treasure" : {}}
 battle_items = {"weapon" : {}, "armour" : {}}
 battle_items_name =[]
-
-# Variables to track the keys, weapons and treasures in the room.
-key_num = 1;
-weapon_num = 6;
-treasure_num = 1
-# Variable Section ends.
 
 # Functions Start.
 
@@ -55,6 +49,7 @@ def read_files(room_num):
 
 # Reading shop files and Extracting the data
 def read_shop():
+    original_key=1
     with open("Shop.txt", "r") as my_shop:
         shop_wholetext = my_shop.readlines()
         for index, line in enumerate(shop_wholetext):
@@ -65,7 +60,7 @@ def read_shop():
             if "key" in shop_wholetext[index]:
                 temp = temp.split(':')
                 temp2 = temp[1].split(',')
-                shop_items["key"][temp[0]+temp2[0]] = temp2
+                shop_items["key"][temp[0]+str(original_key)] = temp2
             if "HealingPad" in line:
                 heal = line.split(" ")
                 shop_items["healing pad"][0] = shop_wholetext[index+1].strip()
@@ -226,9 +221,9 @@ def start_fight(room, message, room_GUI):
     leave = tkinter.Button(room_GUI, text="Leave the Room", command=lambda: runAway_function(room_GUI), bg= "red", fg= "white", font = ('Calibri, 12') )
     leave.pack(padx= 10)
     if points<0:
-        winorlose.config(text="Game Over! You have got below zero points.")
+        winorlose.configure(text="Game Over! You have got below zero points.", font = ('Calibri, 12'))
     if points>=10:
-        winorlose.config(text="Congratulations! You have got 10 points and you won the game!!")
+        winorlose.configure(text="Congratulations! You have got 10 points and you won the game!!", font = ('Calibri, 12'))
 
 # Running away from the city without fighting
 def runAway_function(room_GUI):
@@ -239,17 +234,20 @@ def runAway_function(room_GUI):
 
 # Displaying the data of the shop
 def shop_show():
-    shop_window = tkinter.Tk() 
-    shop_window.geometry("1500x800")
-    shop_window.title("Shop")
-    greeting = tkinter.Label(shop_window, text = 'Welcome to the shop!', font = ('Calibri, 14'))
-    greeting.pack(pady = 5)
-    chooseAction = tkinter.Frame(shop_window)
-    chooseAction.pack(anchor = "n", padx = 10, pady =5)
-    buyAction = tkinter.Button(chooseAction, text= 'BUY', command=lambda: shop_buy_show(shop_window),  fg= "white", bg= "green", font=('Calibri, 14') )
-    buyAction.grid(row=0, column=0, padx=10, pady=5)
-    sellAction = tkinter.Button(chooseAction, text= 'SELL', command=lambda: shop_sell_show(chooseAction) ,  fg= "white", bg= "red", font=('Calibri, 14') )
-    sellAction.grid(row=0, column=1, padx=10, pady=5)
+    if points>=0 and points<10:
+        shop_window = tkinter.Tk() 
+        shop_window.geometry("1500x800")
+        shop_window.title("Shop")
+        greeting = tkinter.Label(shop_window, text = 'Welcome to the shop!', font = ('Calibri, 14'))
+        greeting.pack(pady = 5)
+        chooseAction = tkinter.Frame(shop_window)
+        chooseAction.pack(anchor = "n", padx = 10, pady =5)
+        buyAction = tkinter.Button(chooseAction, text= 'BUY', command=lambda: shop_buy_show(shop_window),  fg= "white", bg= "green", font=('Calibri, 14') )
+        buyAction.grid(row=0, column=0, padx=10, pady=5)
+        sellAction = tkinter.Button(chooseAction, text= 'SELL', command=lambda: shop_sell_show(chooseAction) ,  fg= "white", bg= "red", font=('Calibri, 14') )
+        sellAction.grid(row=0, column=1, padx=10, pady=5)
+    else:
+        messagebox.config(text="You cannot enter the shop now!!!")
 
 # Shop GUI
 def shop_buy_show(shop_window):
@@ -487,8 +485,8 @@ def quit_game():
 
 # Resetting the game
 def reset_game():
-    global balance, health, points, inventory
-    balance = random.randint(50, 310)
+    global balance, health, points, inventory, key_num, weapon_num, treasure_num
+    balance = random.randint(200, 500)
     health = 100
     points = 0
     inventory = {"weapon": {}, "key": {}, "healing pad": 0, "armour": {}, "treasure" : {}}
@@ -500,16 +498,22 @@ def reset_game():
     read_files("room3")
     read_files("room4")
     read_shop()
+    key_num =  len(shop_items["key"]) + 1;
+    weapon_num = len(shop_items["weapon"]) + 1;
+    treasure_num = 1
     weapons_details.configure(text= "Weapons - " + str(inventory["weapon"]), font = ('Calibri, 12'))
     key_details.configure(text="Keys - " +   str(inventory["key"]), font = ('Calibri, 12'))
     healing_details.configure(text= "No: of healing pads - " +  str(inventory["healing pad"]), font = ('Calibri, 12'))
     armour_details.configure(text="Armours - " + str(inventory["armour"]), font = ('Calibri, 12'))
     treasure_details.configure(text= "", font = ('Calibri, 12'))
     messagebox.configure(text="Game Resetted!" , font = ('Calibri, 12'))
+    winorlose.configure(text="")
 
 # Opening treasure box
 def open_treasure_box():
     global inventory, points
+    if len(inventory["key"]) == 0:
+        messagebox.config(text="No keys to collect treasure box!")
     for item in inventory["treasure"]:
         for key in inventory["key"]:
             if inventory["treasure"][item][0] == inventory["key"][key][0]:
@@ -521,11 +525,13 @@ def open_treasure_box():
             else:
                 messagebox.config(text="The keys do not match the treasure box!")                
         break
-    if len(inventory["key"]) == 0:
-        messagebox.config(text="No keys to collect treasure box!")
     playerPoints.config(text="Points: " + str(points), font = ('Calibri, 12'))
     treasure_details.configure(text="Treasure - " + str(inventory["treasure"]), font = ('Calibri, 12'))
     key_details.configure(text="Keys - " + str(inventory["key"]), font = ('Calibri, 12'))
+    if points<0:
+        winorlose.configure(text="Game Over! You have got below zero points.", font = ('Calibri, 12'))
+    if points>=10:
+        winorlose.configure(text="Congratulations! You have got 10 points and you won the game!!", font = ('Calibri, 12'))
 # Functions end.
 
 # The program starts from here.
@@ -575,6 +581,11 @@ read_files("room2")
 read_files("room3")
 read_files("room4")
 read_shop()
+
+# Variables to track the keys, weapons and treasures in the room.
+key_num = len(shop_items["key"]) + 1
+weapon_num = len(shop_items["weapon"]) + 1
+treasure_num = 1
 
 # Showing GUI to the user
 window.mainloop()
