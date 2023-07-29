@@ -1,6 +1,19 @@
-*About the Game
+# Adventure Game
 
-This game is called "Adventure Game". When the game starts, the player has full health, random money between 50 to 310 and 0 points. The player wins the game if they reach 10 points and loses if it falls below 0 points.
+Description 
+
+This repository contains an "Adventure Game" implemented in Python Programming Language.
+
+Packages/Libraries
+
+It is advised to install the following packages/libraries before playing the game.
+
+1. Tkinter library (For Graphical User Interface)
+2. Random library (For random function)
+
+About the Game
+
+When the game starts, the player has full health, random money between 200 to 500 and 0 points. The player wins the game if they reach 10 points and loses if it falls below 0 points.
 
 The player can buy the weapons, armours, keys and healing pads from the shop. The player can use the weapons to fight the enemies, armours to reduce the health of the enemies, healing pads to increase the player's health by 50 and keys to open the treasure box. Moreover, the player can sell these in the shop once they need money.
 
@@ -10,11 +23,4 @@ If the player wins, he/she gets the points, all the items and money in the city.
 
 There are treasure boxes hidden in some cities which can only be opened with the correct key to help the player win more quickly. The player can leave the game or reset the game at any time.
 
-*Packages/Libraries Used
-
--Tkinter (For Graphical User Interface)
--Random (For random function)
-
-*Link to Online Repository
-
-https://github.com/HtetAungHlaing21/Python-Adventure-Game.git
+Enjoy the game! Good Luck!!
